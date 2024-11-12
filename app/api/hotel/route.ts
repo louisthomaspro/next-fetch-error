@@ -1,7 +1,15 @@
 import { headers } from 'next/headers';
-import { HotelResponse, HotelVariables } from './types';
+import { HotelVariables } from './types';
+import axios from "axios";
+import https from "https";
 
 const SIMPLEBOOKING_API = 'https://www.simplebooking.it/graphql/ibe2/graphql';
+
+// Updated HTTPS agent with simplified TLS configuration
+const httpsAgent = new https.Agent({
+  minVersion: 'TLSv1.2',
+  maxVersion: 'TLSv1.3',
+});
 
 export async function GET(request: Request) {
   try {
@@ -41,31 +49,26 @@ export async function GET(request: Request) {
       languageCode,
     };
 
-    const response = await fetch(SIMPLEBOOKING_API, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': userAgent,
-        'X-Forwarded-For': clientIp,
-        'Accept': 'application/json',
-        'Accept-Language': languageCode,
-      },
-      body: JSON.stringify({
+    const response = await axios.post(
+      SIMPLEBOOKING_API,
+      {
         query,
         variables,
-      }),
-      next: {
-        revalidate: 3600 // Cache for 1 hour
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': userAgent,
+          'X-Forwarded-For': clientIp,
+          'Accept': 'application/json',
+          'Accept-Language': languageCode,
+        },
+        timeout: 30000,
+        httpsAgent, // Add the custom HTTPS agent
       }
-    });
+    );
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch hotel data');
-    }
-
-    const data: HotelResponse = await response.json();
-
-    return Response.json(data, {
+    return Response.json(response.data, {
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
@@ -77,10 +80,12 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error('Hotel API Error:', error);
+    const status = axios.isAxiosError(error) && error.response ? error.response.status : 500;
+    
     return Response.json(
       { error: 'Failed to fetch hotel data' },
       { 
-        status: 500,
+        status,
         headers: {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-store',
