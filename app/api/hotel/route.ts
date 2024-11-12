@@ -2,13 +2,18 @@ import { headers } from 'next/headers';
 import { HotelVariables } from './types';
 import axios from "axios";
 import https from "https";
+// import { HttpsProxyAgent } from 'hpagent';
 
 const SIMPLEBOOKING_API = 'https://www.simplebooking.it/graphql/ibe2/graphql';
 
 // Updated HTTPS agent with simplified TLS configuration
 const httpsAgent = new https.Agent({
-  secureProtocol: "TLS_method",
+  secureProtocol: 'TLSv1_2_method' // Specify the TLS version, e.g., 'TLSv1_2_method' for TLS 1.2
 });
+
+// const dataCenterProxyAgent = new HttpsProxyAgent({
+//   proxy: process.env.BRIGHTDATA_ALIEXPRESS_SCRAPING_PROXY_URL!,
+// })
 
 export async function GET(request: Request) {
   try {
