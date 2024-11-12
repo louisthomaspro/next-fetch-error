@@ -7,8 +7,7 @@ const SIMPLEBOOKING_API = 'https://www.simplebooking.it/graphql/ibe2/graphql';
 
 // Updated HTTPS agent with simplified TLS configuration
 const httpsAgent = new https.Agent({
-  minVersion: 'TLSv1.2',
-  maxVersion: 'TLSv1.3',
+  secureProtocol: "TLS_method",
 });
 
 export async function GET(request: Request) {
