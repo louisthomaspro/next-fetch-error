@@ -2,23 +2,27 @@ import { headers } from 'next/headers';
 import { HotelVariables } from './types';
 import axios from "axios";
 import https from "https";
-import fs from 'fs';
-import path from 'path';
 // import { HttpsProxyAgent } from 'hpagent';
+import { promises as fs } from 'fs';
 
 const SIMPLEBOOKING_API = 'https://www.simplebooking.it/graphql/ibe2/graphql';
 
-// Updated HTTPS agent with disabled certificate verification
-const httpsAgent = new https.Agent({
-  rejectUnauthorized: false, // Disable certificate verification
-  keepAlive: true
-});
+// Updated HTTPS agent with corrected TLS configuration
+
 
 // const dataCenterProxyAgent = new HttpsProxyAgent({
 //   proxy: process.env.BRIGHTDATA_ALIEXPRESS_SCRAPING_PROXY_URL!,
 // })
 
 export async function GET(request: Request) {
+  const cert = await fs.readFile(process.cwd() + '/app/api/hotel/simplebooking.travel.crt', 'utf8');
+
+  const httpsAgent = new https.Agent({
+    ca: cert,
+    minVersion: 'TLSv1.2',
+    rejectUnauthorized: true
+  });
+
   try {
     const headersList = await headers();
     const userAgent = headersList.get('user-agent') ?? '';
