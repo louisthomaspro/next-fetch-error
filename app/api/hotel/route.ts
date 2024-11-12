@@ -3,7 +3,6 @@ import { HotelVariables } from './types';
 import axios from "axios";
 import https from "https";
 // import { HttpsProxyAgent } from 'hpagent';
-import { promises as fs } from 'fs';
 
 const SIMPLEBOOKING_API = 'https://www.simplebooking.it/graphql/ibe2/graphql';
 
