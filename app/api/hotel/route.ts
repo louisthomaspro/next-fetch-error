@@ -6,13 +6,6 @@ import https from "https";
 
 const SIMPLEBOOKING_API = 'https://www.simplebooking.it/graphql/ibe2/graphql';
 
-// Updated HTTPS agent with corrected TLS configuration
-
-
-// const dataCenterProxyAgent = new HttpsProxyAgent({
-//   proxy: process.env.BRIGHTDATA_ALIEXPRESS_SCRAPING_PROXY_URL!,
-// })
-
 export async function GET(request: Request) {
   const cert = `-----BEGIN CERTIFICATE-----
 MIIG2TCCBcGgAwIBAgIQKbWf4wcgNyddFKRW3+NDdzANBgkqhkiG9w0BAQsFADCB
@@ -52,13 +45,12 @@ ddqwTkpnKqvYuGQyySAKpOEIUW+TZ2jbdQs8ZucQ8pNnbKDz1SjhMH3kaimGv578
 gnCidGlWnRxCDkadws2wx4b/9DOWmUgLRpk7ksUEylPlmaDm1C5L4hM6YBfF53e/
 s9XA4phmp+eOy+hmouDf/xJyYAjXB4t7vHolTLuwmTk/xkgR1SEnB2j3fkdazfaN
 eo5eHjtuUjrm2ioJcfGfr31xW0NJO4+ASc3FkKc=
------END CERTIFICATE-----
-`
+-----END CERTIFICATE-----`
 
   const httpsAgent = new https.Agent({
     ca: cert,
     minVersion: 'TLSv1.2',
-    rejectUnauthorized: true
+    rejectUnauthorized: false,
   });
 
   try {
